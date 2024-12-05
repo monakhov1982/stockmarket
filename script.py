@@ -224,7 +224,7 @@ def show_companies():
         prices.append(c.price)
     idx = sorted(range(len(names)), key=lambda k: names[k])
     print('\nCompanies and their stock prices:\r')
-    print("Symbol \t Company \t Price \t Day change \t Week change\r")
+    print("Company (symbol)\t Price \t Day change \t Week change\r")
     for j in idx:
         c = companies[j]
         if len(history_c[c.symbol])>=2:
@@ -236,10 +236,9 @@ def show_companies():
         else:
             last_week_price = c.price
         day_change = (c.price - last_price)/last_price
-        week_change = (c.price-last_week_price)/last_week_price
-        
-        print("{}\t{}\t${:,}\t{:+.2f}\t{:+.2f}\r".format(c.symbol, c.name, round(c.price,2), day_change, week_change))
-        print("\n")
+        week_change = (c.price-last_week_price)/last_week_price        
+        print("{} ({})\t${:,}\t{:+.2f}\t{:+.2f}\r".format(c.name, c.symbol, round(c.price,2), day_change, week_change))
+    print("\n")
         
         
 # rank investors
