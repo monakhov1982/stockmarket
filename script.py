@@ -149,7 +149,7 @@ class Investor:
         self.value = self.cash
         
     def __repr__(self):
-        return "Investment firm {name} has ${cash} in cash. Its total portfolio value is ${value}\n".format(name=self.name, cash=str(round(self.cash)), value=str(round(self.value)))
+        return "Investment firm {name} has ${cash} in cash. Its total portfolio value is ${value}.\r".format(name=self.name, cash=str(round(self.cash)), value=str(round(self.value)))
         
     def buy(self, symbol, qty, price):
         if comp_dict[symbol].bankrupt==True:
@@ -251,9 +251,70 @@ def show_investors():
     # print(values)
     idx = sorted(range(len(values)), key=lambda k: values[k], reverse=True)
     print("Most successful investors are:\r")
-    for j in range(10):
+    for j in range(len(investors)):
         print("{}\t{}\t${:,}\r".format(str(j+1), names[idx[j]], round(values[idx[j]])))
     print("\n")
+    return idx
+    
+
+# simulate multiple rounds of buying
+def run_others():
+    for t in range(1):
+        for c in companies:
+            c.update_price()        
+            history_c[c.symbol].append(c.price)
+        for i in investors:
+            i.get_value()
+            history_i[i.name].append(i.value)
+            c = random.choice(companies)
+            qty = random.randint(10,100)
+            if i.cash > qty*c.price:
+                i.buy(c.symbol, qty, c.price)
+                
+                
+
+# check portfolios:
+def check_investor(idx):
+    i = investors[idx]
+    i.get_value()
+    print(i)
+    i.print_portfolio()
+    print("\n")
+    
+def main_menu():
+    print("\n############### MAIN MENU ###############\r")
+    print("(press Enter after you select an option)\r")
+    userinput = input("\rTo show the list of companies press C\n To show the leaderboard of investors (and view individual investors info) press I \n To update the market press U \n To exit the game press E. \n").upper()
+    if userinput=="C":
+        show_companies()
+        userinput = input("To buy a stock press B \r To sell a stock press S \r").upper()
+        if userinput=="B":
+            userinput = input("Enter stock symbol.\r").upper()
+            if userinput in comp_dict:
+                if comp_dict[userinput].bankrupt==False:
+                    userinput = input("Enter number of shares. \r")
+                    
+                
+        userinput = main_menu()
+    elif userinput=="I":
+        idx = show_investors()
+        userinput = input("To view the portfolio of one of investors enter its number from the table above (and then Enter)\n To return to main menu press M\n")
+        allowed_values = [str(num) for num in range(len(investors))]
+        print("\n")
+        if userinput.upper()=="M":
+            pass
+        elif userinput in allowed_values:
+            check_investor(idx[int(userinput)-1])
+        userinput = main_menu()
+    elif userinput=="U":
+        run_others()
+        userinput = main_menu()  
+    elif userinput=="E":
+        print('Good bye!\r')
+        quit()
+    return userinput
+    
+       
     
 # Initialize companies
 companies = []
@@ -272,39 +333,16 @@ history_i = {i.name:[initial_cash] for i in investors}
 
     
     
-# Test methods
+# Initialize user
 username = input("Please enter your name.\n")
 u = Investor(username, initial_cash, {})
 print(f"Welcome, {username}! You start with ${initial_cash:,}\r")
-userinput = input("To show the list of companies press C.\n To show the leaderboard of investors press I \n Then press Enter.\n")
-if userinput.upper()=="C":
-    show_companies()
-elif userinput.upper()=="I":
-    show_investors()
+userinput = main_menu()
+
     
 
-
-# simulate multiple rounds of buying
-for t in range(1):
-    for c in companies:
-        c.update_price()
+ 
         
-        history_c[c.symbol].append(c.price)
-    for i in investors:
-        i.get_value()
-        history_i[i.name].append(i.value)
-        c = random.choice(companies)
-        qty = random.randint(10,100)
-        if i.cash > qty*c.price:
-            i.buy(c.symbol, qty, c.price)
-        
-        
-    
-# check portfolios:
-for i in investors:
-    i.get_value()
-    print(i)
-    i.print_portfolio()
     
 
     
