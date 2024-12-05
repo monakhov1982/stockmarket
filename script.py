@@ -109,17 +109,34 @@ class Company:
         self.revenue = revenue
         self.revenue_est = revenue_est
         self.market_cap = self.shares_total*self.price
+        self.trend = random.gauss(0, self.price*0.001) # where the price tends to go
+        self.bankrupt = False
                 
     def __repr__(self):
-        description = "{name} ({symbol}) shares cost ${price}. It's latest revenue is ${revenue} and market capitalization is ${marketcap}.\n".format(name=self.name,symbol=self.symbol, price=str(round(self.price,1)), revenue=str(self.revenue), marketcap=str(round(self.market_cap)))
+        if self.bankrupt==False:
+            description = "{name} ({symbol}) shares cost ${price}. It's latest revenue is ${revenue} and market capitalization is ${marketcap}.\n".format(name=self.name,symbol=self.symbol, price=str(round(self.price,1)), revenue=str(self.revenue), marketcap=str(round(self.market_cap)))
+        else:
+            description = "{self.name} ({self.symbol}) was good, but it went bankrupt.\n"
         return description
         
     def update_price(self):
-        random_number = random.gauss(0, self.price/10)
-        self.price += round(random_number,1)
-        self.market_cap = self.shares_total*self.price
+        if self.bankrupt==True:
+            return
+        change = random.gauss(0, self.price/10) + self.trend 
+        self.price += round(change,1)
+        if self.price<=0:
+            self.price = 0
+            self.bankrupt = True
+            self.market_cap = 0
+            self.revenue = 0
+            self.revenue_est = 0
+            print("Company {} went bankrupt!\n".format(self.name))
+            return
+        self.market_cap = self.shares_total*self.price # update Market Capital too
         
     def update_revenue(self):
+        if self.bankrupt==True:
+            return    
         random_number = random.gauss(0, self.revenue/10)
         self.revenue += round(random_number,1)        
         
@@ -135,8 +152,11 @@ class Investor:
         return "Investment firm {name} has ${cash} in cash. Its total portfolio value is ${value}\n".format(name=self.name, cash=str(round(self.cash)), value=str(round(self.value)))
         
     def buy(self, symbol, qty, price):
+        if comp_dict[symbol].bankrupt==True:
+            print("{} is bankrupt, can't buy their stock.\r".format(symbol))
+            return
         if qty*price>self.cash:
-            print("Not enough cash!\n")
+            print("Not enough cash!\r")
             return
         if not symbol in self.portfolio:
             self.portfolio[symbol] = [0, 0] # qty, price (cost basis)
@@ -151,14 +171,17 @@ class Investor:
         self.cash -= qty*price
         self.portfolio[symbol][0] += qty
         self.portfolio[symbol][1] = new_cost_basis
-        print("{name} purchased {n} shares of {symbol} at ${price}.\n".format(name=self.name, symbol=symbol, n=str(qty), price=str(price)))
+        print("{name} purchased {n} shares of {symbol} at ${price}.\r".format(name=self.name, symbol=symbol, n=str(qty), price=str(round(price,1))))
         
     def sell(self, symbol, qty, price):
+        if comp_dict[symbol].bankrupt==True:
+            print("{symbol} is bankrupt, can't sell their stock.\r")
+            return    
         if not symbol in self.portfolio:
-            print("{} can't sell {},it is not in portfolio of (short selling is not implemented yet...).\n".format(self.name, symbol))
+            print("{} can't sell {},it is not in portfolio of (short selling is not implemented yet...).\r".format(self.name, symbol))
             return
         if qty > self.portfolio[symbol][0]:
-            print("Can't sell! {} does not have enough shares of stock {}.\n".format(self.name,symbol))
+            print("Can't sell! {} does not have enough shares of stock {}.\r".format(self.name,symbol))
             return
         self.portfolio[symbol][0] -= qty
         self.cash += qty*price
@@ -183,11 +206,12 @@ class Investor:
             price = comp_dict[k].price
             prices.append(price)
             values.append(price*v[0])
+            # print(price)
         idx = sorted(range(len(values)), key=lambda k: values[k], reverse=True) # https://stackoverflow.com/questions/7851077/how-to-return-index-of-a-sorted-list
         print("Holings of {}:\r".format(self.name))
         for h in idx:
-            print("{}\t${}\r".format(symbols[h], str(round(values[h])) ))
-        print("Cash ${} \n".format(str(round(self.cash))))
+            print("{}\t${:,}\r".format(symbols[h], round(values[h])))
+        print("Cash ${:,} \n".format((round(self.cash))))
         
         
     
@@ -197,39 +221,34 @@ comp_dict = {}
 for i in range(len(company_names)):
     companies.append(Company(company_names[i], ticker_symbols[i], round(random.uniform(10, 200), 1), round(random.uniform(100000, 100000)), round(random.uniform(1000000, 1000000)), round(random.uniform(1000000, 1000000))))
     comp_dict[ticker_symbols[i]] = companies[i] # create a dictionary of companies for easy lookup
+history_c = {c.symbol:[c.price] for c in companies}
+# print(history_c)
     
 # Initialize investors
 investors = []
 for i in range(len(investment_entities)):
-    investors.append(Investor(investment_entities[i], round(random.uniform(100000, 100000)), {}))
+    investors.append(Investor(investment_entities[i], initial_cash, {}))
+history_i = {i.name:[initial_cash] for i in investors}
+
     
     
 # Test methods
 
-# i = investors[0]
-# c = companies[0]
-# print(c.symbol)
-# print(i)
-# print(c)
-# i.buy(ticker_symbols[0],100,100)
-# print(i)
-# print(c)
-# i.sell(ticker_symbols[0],10,100)
-# print(i)
-# print(c)
-# c.update_price()
-# print(c)
-# c.update_revenue()
-# i.get_value()
-# print(i)
-# print(c)
-
 # simulate multiple rounds of buying
-for i in investors:
-    for j in range(100):
-        c = random.choice(companies)
+for t in range(10):
+    for c in companies:
         c.update_price()
-        i.buy(c.symbol, random.randint(10,100), c.price)
+        
+        history_c[c.symbol].append(c.price)
+    for i in investors:
+        i.get_value()
+        history_i[i.name].append(i.value)
+        c = random.choice(companies)
+        qty = random.randint(10,100)
+        if i.cash > qty*c.price:
+            i.buy(c.symbol, qty, c.price)
+        
+        
     
 # check portfolios:
 for i in investors:
@@ -245,17 +264,34 @@ for i in investors:
     values.append(i.value)
 # print(values)
 idx = sorted(range(len(values)), key=lambda k: values[k], reverse=True)
-print("Best investors are:\r")
+print("Most successful investors are:\r")
 for j in range(10):
-    print("{}\t{}\t${}\r".format(str(j+1), names[idx[j]], str(round(values[idx[j]]))))
+    print("{}\t{}\t${:,}\r".format(str(j+1), names[idx[j]], round(values[idx[j]])))
     
     
+# show companies
+symbols = []
+names = []
+prices = []
+for c in companies:
+    symbols.append(c.symbol)
+    names.append(c.name)
+    prices.append(c.price)
+idx = sorted(range(len(names)), key=lambda k: names[k])
+print('\nCompanies and their stock prices:\r')
+print("Symbol \t Company \t Price \t Day change \t Week change\r")
+for j in idx:
+    c = companies[j]
+    if len(history_c[c.symbol])>=2:
+        last_price = history_c[c.symbol][-2]
+    else:
+        last_price = c.price
+    if len(history_c[c.symbol])>=7:
+        last_week_price = history_c[c.symbol][-7]
+    else:
+        last_week_price = c.price
+    day_change = (c.price - last_price)/last_price
+    week_change = (c.price-last_week_price)/last_week_price
     
-# i = investors[2]
-# print(i)   
-# for j in range(10):
-    # c = random.choice(companies)
-    # print(c)
-    # i.buy(c.symbol, random.randint(10,20), c.price) 
-    # print(i)
-    # print(i.portfolio)
+    print("{}\t{}\t${:,}\t{:+.2f}\t{:+.2f}\r".format(c.symbol, c.name, round(c.price,2), day_change, week_change))
+    
