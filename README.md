@@ -38,3 +38,30 @@ each of them has some cash too.
 Player starts with $1,000,000.
 
 
+News statements:
+
+
+News about price gains:
+"Despite higher Treasury yields interest in stocks remains high"
+"shares rose sharply"
+"shares rose following stronger-than-expected results"
+
+News about price loss:
+"disclosed financial impairments related to its operations in China, impacting its stock negatively."
+"stock dipped"
+"shares tumbled"
+
+News about high revenue:
+"reported better-than-expected revenue"
+"exceeded revenue expectations and offered an optimistic outlook."
+"Trading shows optimism, driven by strong revenue reports from companies such as"
+"saw significant gains after beating revenue estimates."
+"showed solid performance with earnings and revenue beats, alongside a management transition announcement."
+
+
+
+News about pharma companies:
+"reported positive trial results for its drug {}, outperforming a competitor's product"
+
+Other news:
+"continues to navigate a difficult operating environment"
