@@ -213,7 +213,48 @@ class Investor:
             print("{}\t${:,}\r".format(symbols[h], round(values[h])))
         print("Cash ${:,} \n".format((round(self.cash))))
         
+# show companies
+def show_companies():
+    symbols = []
+    names = []
+    prices = []
+    for c in companies:
+        symbols.append(c.symbol)
+        names.append(c.name)
+        prices.append(c.price)
+    idx = sorted(range(len(names)), key=lambda k: names[k])
+    print('\nCompanies and their stock prices:\r')
+    print("Symbol \t Company \t Price \t Day change \t Week change\r")
+    for j in idx:
+        c = companies[j]
+        if len(history_c[c.symbol])>=2:
+            last_price = history_c[c.symbol][-2]
+        else:
+            last_price = c.price
+        if len(history_c[c.symbol])>=7:
+            last_week_price = history_c[c.symbol][-7]
+        else:
+            last_week_price = c.price
+        day_change = (c.price - last_price)/last_price
+        week_change = (c.price-last_week_price)/last_week_price
         
+        print("{}\t{}\t${:,}\t{:+.2f}\t{:+.2f}\r".format(c.symbol, c.name, round(c.price,2), day_change, week_change))
+        print("\n")
+        
+        
+# rank investors
+def show_investors():
+    names = []
+    values = []
+    for i in investors:
+        names.append(i.name)
+        values.append(i.value)
+    # print(values)
+    idx = sorted(range(len(values)), key=lambda k: values[k], reverse=True)
+    print("Most successful investors are:\r")
+    for j in range(10):
+        print("{}\t{}\t${:,}\r".format(str(j+1), names[idx[j]], round(values[idx[j]])))
+    print("\n")
     
 # Initialize companies
 companies = []
@@ -233,9 +274,19 @@ history_i = {i.name:[initial_cash] for i in investors}
     
     
 # Test methods
+username = input("Please enter your name.\n")
+u = Investor(username, initial_cash, {})
+print(f"Welcome, {username}! You start with ${initial_cash:,}\r")
+userinput = input("To show the list of companies press C.\n To show the leaderboard of investors press I \n Then press Enter.\n")
+if userinput.upper()=="C":
+    show_companies()
+elif userinput.upper()=="I":
+    show_investors()
+    
+
 
 # simulate multiple rounds of buying
-for t in range(10):
+for t in range(1):
     for c in companies:
         c.update_price()
         
@@ -256,42 +307,8 @@ for i in investors:
     print(i)
     i.print_portfolio()
     
-# rank investors
-names = []
-values = []
-for i in investors:
-    names.append(i.name)
-    values.append(i.value)
-# print(values)
-idx = sorted(range(len(values)), key=lambda k: values[k], reverse=True)
-print("Most successful investors are:\r")
-for j in range(10):
-    print("{}\t{}\t${:,}\r".format(str(j+1), names[idx[j]], round(values[idx[j]])))
+
     
     
-# show companies
-symbols = []
-names = []
-prices = []
-for c in companies:
-    symbols.append(c.symbol)
-    names.append(c.name)
-    prices.append(c.price)
-idx = sorted(range(len(names)), key=lambda k: names[k])
-print('\nCompanies and their stock prices:\r')
-print("Symbol \t Company \t Price \t Day change \t Week change\r")
-for j in idx:
-    c = companies[j]
-    if len(history_c[c.symbol])>=2:
-        last_price = history_c[c.symbol][-2]
-    else:
-        last_price = c.price
-    if len(history_c[c.symbol])>=7:
-        last_week_price = history_c[c.symbol][-7]
-    else:
-        last_week_price = c.price
-    day_change = (c.price - last_price)/last_price
-    week_change = (c.price-last_week_price)/last_week_price
-    
-    print("{}\t{}\t${:,}\t{:+.2f}\t{:+.2f}\r".format(c.symbol, c.name, round(c.price,2), day_change, week_change))
+
     
