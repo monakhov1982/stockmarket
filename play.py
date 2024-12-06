@@ -177,7 +177,7 @@ class Company:
         self.name = name
         self.symbol = symbol
         self.price = price
-        self.trend = random.gauss(self.price*0.001, self.price*0.001) # where the price tends to go
+        self.trend = random.gauss(self.price*0.002, self.price*0.001) # where the price tends to go
         self.bankrupt = False
                 
     def __repr__(self):
@@ -190,11 +190,12 @@ class Company:
     def update_price(self):
         if self.bankrupt==True:
             return
-        change = random.gauss(0, self.price/10) + self.trend 
+        change = random.gauss(0, self.price/5) + self.trend 
         self.price += round(change,1)
         if self.price<=0:
             self.price = 0
             self.bankrupt = True
+            print("Bankrupt\r")
             print(f"Company {self.name} went bankrupt!\n")
         
         
@@ -288,16 +289,20 @@ def show_companies():
     print("Company \t\t Symbol \t Price \t Day change \t Week change\r")
     for j in idx:
         c = companies[j]
-        if len(history_c[c.symbol])>=2:
-            last_price = history_c[c.symbol][-2]
+        if c.bankrupt==False:
+            if len(history_c[c.symbol])>=2:
+                last_price = history_c[c.symbol][-2]
+            else:
+                last_price = c.price
+            if len(history_c[c.symbol])>=7:
+                last_week_price = history_c[c.symbol][-7]
+            else:
+                last_week_price = c.price
+            day_change = (c.price - last_price)/last_price
+            week_change = (c.price-last_week_price)/last_week_price        
         else:
-            last_price = c.price
-        if len(history_c[c.symbol])>=7:
-            last_week_price = history_c[c.symbol][-7]
-        else:
-            last_week_price = c.price
-        day_change = (c.price - last_price)/last_price
-        week_change = (c.price-last_week_price)/last_week_price        
+            day_change = 0
+            week_change = 0
         print(f"{c.name.ljust(30)} {c.symbol.ljust(4)}\t ${round(c.price,2):,}\t\t{day_change:+.2f}\t\t{week_change:+.2f}\r")
     print("\n")
         
@@ -331,10 +336,16 @@ def update_market(n_iter=1, print_info=True):
         # Update companies
         change = [] # day change of price
         for c in companies:
-            c.update_price()        
-            history_c[c.symbol].append(c.price)
-            last_price = history_c[c.symbol][-2]
-            change.append((c.price-last_price)/last_price)
+            if c.bankrupt==False:
+                last_price = c.price
+                c.update_price()
+                current_price = c.price
+                price_change = (current_price-last_price)/last_price
+            else:
+                current_price = 0
+                price_change = 0
+            history_c[c.symbol].append(current_price)
+            change.append(price_change)
             
         # Print some news about the market, top day gainers and loosers
         if print_info==True:

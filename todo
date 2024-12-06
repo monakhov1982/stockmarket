@@ -1,0 +1,27 @@
+changes in %
+show notice about upper or lower only once, in the beginning of the game
+"Options: 
+To view any investor's details enter their number from the table, then Enter
+To return to main menu press any other key"
+
+Trading menu:
+P to view my own portfolio
+
+increase divider line, make it more salient, attention should be directed to the line below it
+
+Investment firm {} has portfolio market value is {}.
+Current holdings:
+..
+..
+Cash {}
+
+add percentages to holdings in investor info
+
+other investors moves - make one line, or reduce number, or both
+
+"Enter valid number from the table" not necessary after return from investor details (if not a number was entered it means the user wanted to leave investor details view)
+
+In the beginning, in menu explanation:
+After entering a key (or any input) always press Enter.
+
+"You don't have enough shares..." - show to the user how many shares he has
