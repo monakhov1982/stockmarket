@@ -25,3 +25,22 @@ In the beginning, in menu explanation:
 After entering a key (or any input) always press Enter.
 
 "You don't have enough shares..." - show to the user how many shares he has
+
+After "not enough cash" and "not enough shares" messages the user should return to the input line where we ask to enter number of shares (not to main menu)
+
+
+"Y  Confirm
+N   Cancel
+Then press Enter"
+
+In companies table align price value by the right side?
+
+don't show "has sold 0 shares" in investors moves
+
+the number from the table, that you enter to select one investor, can't include 17 - but this is valid number... need to edit the 'range' somewhere?
+
+don't show portfolio positions with 0 shares
+
+show news about bankruptcies and elimiate those companies from simulation
+
+don't show "{} is bankrupt, can't buy their stock" if these are actions of other investors.
