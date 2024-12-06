@@ -11,17 +11,3 @@ Player can view current market prices, buy and sell stocks and compare his perfo
               $$       $$       $$
         $$     $$ $$     $$ $$     $$
          $$$$$$$   $$$$$$$   $$$$$$$
-
-
-Price ^
-      |
-      |                 *
-      |               *
-      |             *
-      |           *
-      |         *
-      |       *
-      |     *
-      |   *
-      | *
-      +-------------------------------------------------> Time
