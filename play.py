@@ -167,7 +167,7 @@ Price ^
       +--------------------> Time
 """
 
-divider_line = "################################################\r"
+divider_line = "********************************************************************************\n********************************************************************************\n"
 
 
 
@@ -207,7 +207,7 @@ class Investor:
         self.value = self.cash
         
     def __repr__(self):
-        return f"Investment firm {self.name} has ${round(self.cash):,} in cash. Its total portfolio value is ${round(self.value):,}.\r"
+        return f"Investment firm {self.name} has a portfolio with market value of ${round(self.value):,}.\r"
         
     def buy(self, symbol, qty, price, print_transaction=True):
         if comp_dict[symbol].bankrupt==True:
@@ -266,7 +266,7 @@ class Investor:
             prices.append(price)
             values.append(price*v[0])
         idx = idx_sorted(values)
-        print(f"Current holdings of {self.name}:\r")
+        print(f"Current holdings:\r")
         for h in idx:
             print(f"{symbols[h]}\t${round(values[h]):,}\r")
         print(f"Cash ${round(self.cash):,} \n")
@@ -303,7 +303,7 @@ def show_companies():
         else:
             day_change = 0
             week_change = 0
-        print(f"{c.name.ljust(30)} {c.symbol.ljust(4)}\t ${round(c.price,2):,}\t\t{day_change:+.2f}\t\t{week_change:+.2f}\r")
+        print(f"{c.name.ljust(30)} {c.symbol.ljust(4)}\t ${round(c.price,2):,}\t\t{day_change*100:+.0f}%\t\t{week_change*100:+.0f}%\r")
     print("\n")
         
         
@@ -406,14 +406,13 @@ def process_qty(qty):
     
 # UI    
 def main_menu():
+    print(f"\nThis is day {day}.\r")
     print("\n# MAIN MENU #\r")
-    print(f"This is day {day}.\r")
-    print("(press one of the keys (upper or lower case - doesn't matter) and then Enter)\r")
     userinput = input("\r Options:\n C\t Show the list of companies and trade stocks  \n I\t Show the leaderboard of investors (and view individual investors info)  \n U\t Pass and let other investors make their moves  \n P\t View your portfolio  \n E\t Exit the game . \n").upper()
     if userinput=="C":
         show_companies()
         print("Trading menu:\r")
-        userinput = input("\n To buy a stock press B \n To sell a stock press S \n To return to main menu press M (or any other key). \n").upper()
+        userinput = input("\n B \t Buy a stock \n S \t Sell a stock  \n P \t View your portfolio \n M \t Return to main menu (or press any other key instead of M). \n").upper()
         
         # Buying
         if userinput=="B":
@@ -430,17 +429,16 @@ def main_menu():
                         userinput = main_menu()
                     else:
                         print(f"You are about to place market buy order for {qty} shares of {symbol}. The price is ${round(price,2):,}, total is ${total:,}. \r")
-                        confirmation = input("Press Y to confirm, N to cancel.\n").upper()
+                        confirmation = input("\n Y \t Confirm \n N \t Cancel\n").upper()
                         if confirmation=="Y":
                             print(divider_line)
                             user.buy(symbol, qty, price)
                             print("\n")
                             update_market()                            
-                            userinput = main_menu()
                         elif confirmation=="N":
                             print(divider_line)
                             print("Order canceled.\r")
-                            userinput = main_menu()
+                        userinput = main_menu()
                 else:
                     print(divider_line)
                     print("That company is bankrupt!\n")
@@ -468,17 +466,16 @@ def main_menu():
                         total = round(price*qty,2)
                         cost_basis = round(user.portfolio[symbol][1])
                         print(f"You are about to place market sell order for {qty} shares of {symbol}. The price is ${round(price,2):,}, total is ${total:,}. The cost basis is ${cost_basis:,}. \r")
-                        confirmation = input("Press Y to confirm, N to cancel. Then press Enter. \n").upper()
+                        confirmation = input("\n Y \t Confirm \n N \t Cancel\n").upper()
                         if confirmation=="Y":
                             print(divider_line)
                             user.sell(symbol, qty, price)
                             print("\n")
                             update_market()
-                            userinput = main_menu()
                         elif confirmation=="N":
                             print(divider_line)
                             print("Order canceled.\r")
-                            userinput = main_menu()
+                        userinput = main_menu()
                 else:
                     print(divider_line)
                     print("That company is bankrupt!\n")
@@ -486,14 +483,20 @@ def main_menu():
             else:
                 print(divider_line)
                 print(f"You don't have any {symbol} in your portfolio (shot selling is not available in this version of the game). Check your portfolio to see what you can sell.\n")
-                userinput = main_menu()                
+                userinput = main_menu() 
+                
+        elif userinput=="P":
+            print("\n")
+            print(divider_line)
+            view_investor(-1) # the user is the last investor in the list
+            userinput = main_menu()                 
         else:
             userinput = main_menu()
             
     elif userinput=="I":
         print(divider_line)
         idx = show_investors()
-        userinput = input("To view the portfolio of one of investors enter its number from the table above (and then Enter)\n To return to main menu press M (or any other key) \n")
+        userinput = input("\n To view any investor's details enter their number from the table, then Enter \n To return to main menu press any other key \n")
         allowed_values = [str(num) for num in range(len(investors))]
         print("\n")
         if userinput in allowed_values:
@@ -514,11 +517,13 @@ def main_menu():
         view_investor(-1) # the user is the last investor in the list
         userinput = main_menu()  
     elif userinput=="E":
-        print(divider_line+'Good bye!\r')
+        print(divider_line)
+        print('Good bye!\r')
         print(rising_stock_plot)
         quit()
     else:
-        print(divider_line+"User input not recognized. Please refer to the menu. \r")
+        print(divider_line)
+        print("User input not recognized. Please refer to the menu. \r")
         userinput = main_menu()  
     return userinput    
        
@@ -540,7 +545,8 @@ history_i = {i.name:[initial_cash] for i in investors}
     
     
 # Initialize user and start the game
-print(divider_line+"\nHello! Welcome to The Stock Market!\n")
+print(divider_line)
+print("\nHello! Welcome to The Stock Market!\n")
 print(dollar_art)
 print("Here you can make money by trading stocks of companies such as {}, {} and many others.\n".format(random.choice(company_names),random.choice(company_names)))
 print("You will be competing with other investors including {}, {} and {}. \n".format(random.choice(investment_entities),random.choice(investment_entities),random.choice(investment_entities)))
@@ -553,5 +559,6 @@ history_i[user.name] = [initial_cash]
 update_market(n_iter=3, print_info=False) # run few rounds of simulation to accumulate differences between investors and changes of stock prices 
 day=1 # reset the 'day' variable, so the user will start with Day 1
 print(divider_line)
-print(f"Welcome, {username}! You start with ${initial_cash:,}\r")
+print(f"Welcome, {username}! You start with ${initial_cash:,}\n")
+print("To navigate the menu select an option, press the letter (can be upper or lower case, doesn't matter) and then press Enter.\n")
 userinput = main_menu()
