@@ -2,6 +2,17 @@ This is a portfolio project for Computer Science course at codeacademy.com. The 
 The game has limitations: only market orders are allowed, only long positions can be open, no options, no futures. 
 Player can view current market prices, buy and sell stocks and compare his performance with other investors. Some stocks tend to appreciate faster then others... find them to make the right bets!
 
+
+
+               $$$$$$$   $$$$$$$   $$$$$$$
+        $$     $$ $$     $$ $$     $$
+        $$        $$        $$
+         $$$$$$    $$$$$$    $$$$$$
+              $$       $$       $$
+        $$     $$ $$     $$ $$     $$
+         $$$$$$$   $$$$$$$   $$$$$$$
+
+
 Price ^
       |
       |            *
@@ -12,12 +23,3 @@ Price ^
       |  *
       | *
       +--------------------> Time
-
-
-               $$$$$$$   $$$$$$$   $$$$$$$
-        $$     $$ $$     $$ $$     $$
-        $$        $$        $$
-         $$$$$$    $$$$$$    $$$$$$
-              $$       $$       $$
-        $$     $$ $$     $$ $$     $$
-         $$$$$$$   $$$$$$$   $$$$$$$
